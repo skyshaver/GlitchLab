@@ -8,6 +8,7 @@ extern "C" {
 }
 #include <cstdint>
 #include <iostream>
+#include <exception>
 
 bool loadFrame(const char* fileName, int* widthOut, int* heightOut, unsigned char** dataOut)
 {
@@ -15,7 +16,7 @@ bool loadFrame(const char* fileName, int* widthOut, int* heightOut, unsigned cha
 	AVFormatContext* avFormatCtx = avformat_alloc_context();
 	if (!avFormatCtx)
 	{
-		std::cout << "coundln't create AVFormatContext\n";
+		std::cout << "couldn't create AVFormatContext\n";
 		return false;
 	}
 

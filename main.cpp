@@ -6,6 +6,8 @@
 #include <iostream>
 
 #include "Shader.h"
+#include "VideoReader.h"
+
 
 const int WWIDTH = 1920;
 const int WHEIGHT = 1080;
@@ -57,6 +59,12 @@ int main()
 		return -1;
 	}
 
+	// class constructor test
+	VideoReader videoReader("videos/butterfly.mp4");
+	uint8_t* frame_Data = new uint8_t[videoReader.getWidth() * videoReader.getHeight() * 4];
+	videoReader.readFrame(frame_Data);
+
+
 	// return params for video frame
 	const char* fileName = "videos/butterfly.mp4";
 	int frameWidth, frameHeight;
@@ -78,7 +86,7 @@ int main()
 			data[y * 100 * 3 + x * 3 + 2] = 0x00;
 		}
 	}
-	// for git push
+
 	//// vertices for rectangle
 	//float vertices[] = {
 	//	// positions          // colors           // texture coords
@@ -107,20 +115,8 @@ int main()
 		 //0.5f, -0.5f, 0.0f,   0.0f, 1.0f, 0.0f,   1.0f, 0.0f,   // bottom right
 	};
 
-	unsigned int indices[] = {
-		0, 1, 3, // first triangle
-		1, 2, 3  // second triangle
-	};
-
-	//// vertices for rectangle
-	//float vertices[] = {
-	//	// positions           // texture coords
-	//	 0.5f,  0.5f, 0.0f,    1.0f, 1.0f,   // top right
-	//	 0.5f, -0.5f, 0.0f,    1.0f, 0.0f,   // bottom right
-	//	-0.5f, -0.5f, 0.0f,    0.0f, 0.0f,   // bottom left
-	//	-0.5f,  0.5f, 0.0f,    0.0f, 1.0f    // top left 
-	//};
-
+	// test class constructor
+	
 
 	// buffer setup
 	unsigned int VBO, VAO; // EBO;
@@ -161,8 +157,8 @@ int main()
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	// generate the texture from our pixel data
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, frameWidth, frameHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE, frameData);
-
+	// glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, frameWidth, frameHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE, frameData);
+	 glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, videoReader.getWidth(), videoReader.getHeight(), 0, GL_RGBA, GL_UNSIGNED_BYTE, frame_Data);
 
 	Shader textureShader("shaders/texture_shader.vert", "shaders/texture_shader.frag");
 
