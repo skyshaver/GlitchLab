@@ -78,7 +78,7 @@ int main()
 			data[y * 100 * 3 + x * 3 + 2] = 0x00;
 		}
 	}
-
+	// for git push
 	//// vertices for rectangle
 	//float vertices[] = {
 	//	// positions          // colors           // texture coords
