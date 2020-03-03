@@ -19,18 +19,22 @@ private:
 	AVPacket* avPacket = nullptr;
 	AVCodecParameters* avCodecParams = nullptr;
 	AVCodec* avCodec = nullptr;
+	AVRational avTimeBase;
 
 	int videoStreamIndex = -1;
 	uint8_t* frameBuffer = nullptr;
+	uint64_t pts; // presentation time 
+	
 
 public:
 	VideoReader(const char* fileName);
 	~VideoReader();
 
 	uint8_t* readFrame();
-	
 	const int getHeight();
 	const int getWidth();
+	double returnPtsInSecs();
+
 };
 
 

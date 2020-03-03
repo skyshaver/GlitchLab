@@ -3,30 +3,29 @@
 
 VideoReader::VideoReader(const char* fileName) 
 {
+	// open file and bind to avFormatCtx
 	this->avFormatCtx = avformat_alloc_context();
-	if (avformat_open_input(&avFormatCtx, fileName, nullptr, nullptr) < 0)
-	{
-		// should the context be freed here on error?
-		throw std::runtime_error("couldn't open video file");
-	}
+	if (avformat_open_input(&avFormatCtx, fileName, nullptr, nullptr) < 0){ throw std::runtime_error("couldn't open video file"); }
 
 	// find first valid video stream
 	for (uint8_t i = 0; i < avFormatCtx->nb_streams; ++i)
 	{
 		auto stream = avFormatCtx->streams[i];
 		avCodecParams = avFormatCtx->streams[i]->codecpar;
+		
 		avCodec = avcodec_find_decoder(avCodecParams->codec_id);
 		if (!avCodec) { continue; }
 		if (avCodecParams->codec_type == AVMEDIA_TYPE_VIDEO)
 		{
 			videoStreamIndex = i;
+			avTimeBase = avFormatCtx->streams[i]->time_base;
 			break;
 		}
 	}
 
 	if (videoStreamIndex == -1){ throw std::runtime_error("couldn't find video stream"); }
 
-	// setup a codec context for the decoder
+	// setup a codec context and get code params for the decoder
 	this->avCodecCtx = avcodec_alloc_context3(avCodec);
 	if (!avCodecCtx) { throw std::runtime_error("couldn't alloc codec ctx"); }
 	if (avcodec_parameters_to_context(avCodecCtx, avCodecParams) < 0) { throw std::runtime_error("couldn't create codec ctx"); }
@@ -60,12 +59,20 @@ uint8_t* VideoReader::readFrame()
 	int response = 0;
 	while (av_read_frame(avFormatCtx, avPacket) >= 0)
 	{
-		if (avPacket->stream_index != videoStreamIndex) { continue; }
+		if (avPacket->stream_index != videoStreamIndex) 
+		{
+			av_packet_unref(avPacket);
+			continue; 
+		}
 		// send packet
 		if (response = (avcodec_send_packet(avCodecCtx, avPacket)) < 0) { throw std::runtime_error("couldn't send packet"); }
 		// receive frame
 		response = avcodec_receive_frame(avCodecCtx, avFrame);
-		if (response == AVERROR(EAGAIN) || response == AVERROR_EOF) { continue; }
+		if (response == AVERROR(EAGAIN) || response == AVERROR_EOF) 
+		{ 
+			av_packet_unref(avPacket);
+			continue; 
+		}
 		else if (response < 0) { throw std::runtime_error("couldn't decode packet"); }
 		av_packet_unref(avPacket);
 		break;
@@ -73,7 +80,7 @@ uint8_t* VideoReader::readFrame()
 
 	// setup scaler for colour conversion
 	// set up conversion from YUV to RGBA
-	// initialize the first time
+	// initialize swsSxcalerCtx the first time readFrame is called
 	if (!swsScalerCtx)
 	{
 		this->swsScalerCtx = sws_getContext(avFrame->width, avFrame->height, avCodecCtx->pix_fmt,
@@ -82,7 +89,6 @@ uint8_t* VideoReader::readFrame()
 	}
 	if (!swsScalerCtx) { throw std::runtime_error("couldn't create scaler ctx"); }
 
-	
 	uint8_t* dest[4] = { frameBuffer, nullptr, nullptr, nullptr };
 	int dest_linesize[4] = { avFrame->width * 4, 0, 0, 0 };
 	sws_scale(swsScalerCtx, avFrame->data, avFrame->linesize, 0, avFrame->height, dest, dest_linesize);
@@ -101,4 +107,10 @@ const int VideoReader::getWidth()
 {
 	if(!avCodecParams) { throw std::runtime_error("codec params not filled yet"); }
 	return avCodecParams->width;
+}
+
+// has to be called after first call to readFrame
+double VideoReader::returnPtsInSecs()
+{
+	return avFrame->pts * (double)avTimeBase.num / (double)avTimeBase.den;
 }

@@ -3,11 +3,8 @@
 #define GLFW_INCLUDE_NONE
 #include <GLFW/glfw3.h>
 
-#include <iostream>
-
 #include "Shader.h"
 #include "VideoReader.h"
-
 
 const int WWIDTH = 1920;
 const int WHEIGHT = 1080;
@@ -26,9 +23,6 @@ void processInput(GLFWwindow* window)
 	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
 		glfwSetWindowShouldClose(window, true);
 }
-
-// func prototype for video streamingsetup
-bool loadFrame(const char* fileName, int* widthOut, int* heightOut, unsigned char** dataOut);
 
 int main()
 {
@@ -50,6 +44,7 @@ int main()
 		glfwTerminate();
 		return -1;
 	}
+
 	glfwMakeContextCurrent(window);
 	glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 
@@ -59,7 +54,7 @@ int main()
 		return -1;
 	}
 
-	// vertices for rectangle inverted but mirrored?
+	// vertices for rectangle, texture mapping inverted but image is mirrored?
 	float vertices[] = {
 		// positions          // colors           // texture coords
 		 0.75f,  0.75f, 0.0f,   1.0f, 0.0f, 0.0f,   0.0f, 0.0f,   // top right
@@ -93,7 +88,7 @@ int main()
 	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
 	glEnableVertexAttribArray(2);
 
-	// texture setup for viewport
+	// texture setup for video play back
 	GLuint tex_handle;
 	glGenTextures(1, &tex_handle);
 	glBindTexture(GL_TEXTURE_2D, tex_handle);
@@ -123,10 +118,22 @@ int main()
 		// apply the texture from our video reader frame data
 		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, videoReader.getWidth(), videoReader.getHeight(), 0,
 			GL_RGBA, GL_UNSIGNED_BYTE, videoReader.readFrame());
-
 		glBindVertexArray(VAO);
-		//glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 		glDrawArrays(GL_TRIANGLES, 0, 6);
+
+		// crude sync
+		static bool firstFrame = true;
+		if (firstFrame)
+		{
+			glfwSetTime(0.0);
+			firstFrame = false;
+		}
+		while (videoReader.returnPtsInSecs() > glfwGetTime())
+		{
+			glfwWaitEventsTimeout(videoReader.returnPtsInSecs() - glfwGetTime());
+		}
+		// end sync
+
 
 		//---------------------------
 		glfwSwapBuffers(window);
