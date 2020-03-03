@@ -24,7 +24,7 @@ public:
 	VideoReader(const char* fileName);
 	~VideoReader();
 
-	void readFrame(uint8_t* frameBuffer);
+	uint8_t* readFrame();
 	
 	const int getHeight();
 	const int getWidth();

@@ -61,8 +61,7 @@ int main()
 
 	// class constructor test
 	VideoReader videoReader("videos/butterfly.mp4");
-	uint8_t* frame_Data = new uint8_t[videoReader.getWidth() * videoReader.getHeight() * 4];
-	videoReader.readFrame(frame_Data);
+	uint8_t* frame_Data = videoReader.readFrame();
 
 
 	// return params for video frame
@@ -114,9 +113,6 @@ int main()
 		-0.75f,  0.75f, 0.0f,   1.0f, 1.0f, 0.0f,   1.0f, 0.0f,    // top left 
 		 //0.5f, -0.5f, 0.0f,   0.0f, 1.0f, 0.0f,   1.0f, 0.0f,   // bottom right
 	};
-
-	// test class constructor
-	
 
 	// buffer setup
 	unsigned int VBO, VAO; // EBO;

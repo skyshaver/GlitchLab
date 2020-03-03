@@ -52,7 +52,7 @@ VideoReader::~VideoReader()
 }
 
 
-void VideoReader::readFrame(uint8_t* frameBuffer)
+uint8_t* VideoReader::readFrame()
 {
 	int response = 0;
 	while (av_read_frame(avFormatCtx, avPacket) >= 0)
@@ -84,16 +84,18 @@ void VideoReader::readFrame(uint8_t* frameBuffer)
 	int dest_linesize[4] = { avFrame->width * 4, 0, 0, 0 };
 	sws_scale(swsScalerCtx, avFrame->data, avFrame->linesize, 0, avFrame->height, dest, dest_linesize);
 	
-	frameBuffer = data;
+	return data;
 
 }
 
 const int VideoReader::getHeight()
 {
-	return avCodecParams->height;
+	if (!avFrame) { throw std::runtime_error("frame hasn't been filled yet"); }
+	return avFrame->height;
 }
 
 const int VideoReader::getWidth()
 {
-	return avCodecParams->width;
+	if(!avFrame) { throw std::runtime_error("frame hasn't been filled yet"); }
+	return avFrame->width;
 }
