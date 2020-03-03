@@ -19,7 +19,10 @@ private:
 	AVPacket* avPacket = nullptr;
 	AVCodecParameters* avCodecParams = nullptr;
 	AVCodec* avCodec = nullptr;
+
 	int videoStreamIndex = -1;
+	uint8_t* frameBuffer = nullptr;
+
 public:
 	VideoReader(const char* fileName);
 	~VideoReader();

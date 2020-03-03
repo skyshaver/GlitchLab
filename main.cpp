@@ -59,46 +59,9 @@ int main()
 		return -1;
 	}
 
-	// class constructor test
+	// init videoreader and get one frame
 	VideoReader videoReader("videos/butterfly.mp4");
 	uint8_t* frame_Data = videoReader.readFrame();
-
-
-	// return params for video frame
-	const char* fileName = "videos/butterfly.mp4";
-	int frameWidth, frameHeight;
-	unsigned char* frameData;
-	if (!loadFrame(fileName, &frameWidth, &frameHeight, &frameData))
-	{
-		std::cout << "failed to load frame!\n";
-		return -1;
-	}
-	
-	// rough pixel data for testing
-	unsigned char* data = new unsigned char[100 * 100 * 3];
-	for (int x = 0; x < 100; ++x) 
-	{
-		for (int y = 0; y < 100; ++y) 
-		{
-			data[y * 100 * 3 + x * 3    ] = 0xff;
-			data[y * 100 * 3 + x * 3 + 1] = 0x00;
-			data[y * 100 * 3 + x * 3 + 2] = 0x00;
-		}
-	}
-
-	//// vertices for rectangle
-	//float vertices[] = {
-	//	// positions          // colors           // texture coords
-	//	 1.0f,  1.0f, 0.0f,   1.0f, 0.0f, 0.0f,   1.0f, 1.0f,   // top right
-	//	 1.0f, -1.0f, 0.0f,   0.0f, 1.0f, 0.0f,   1.0f, 0.0f,   // bottom right
-	//	//-0.5f, -0.5f, 0.0f,   0.0f, 0.0f, 1.0f,   0.0f, 0.0f,   // bottom left
-	//	-1.0f,  1.0f, 0.0f,   1.0f, 1.0f, 0.0f,   0.0f, 1.0f,    // top left 
-
-	//	 1.0f, -1.0f, 0.0f,   0.0f, 1.0f, 0.0f,   1.0f, 0.0f,   // bottom right
-	//	-1.0f, -1.0f, 0.0f,   0.0f, 0.0f, 1.0f,   0.0f, 0.0f,   // bottom left
-	//	-1.0f,  1.0f, 0.0f,   1.0f, 1.0f, 0.0f,   0.0f, 1.0f,    // top left 
-	//	 //0.5f, -0.5f, 0.0f,   0.0f, 1.0f, 0.0f,   1.0f, 0.0f,   // bottom right
-	//};
 
 	// vertices for rectangle inverted but mirrored?
 	float vertices[] = {
@@ -115,15 +78,11 @@ int main()
 	};
 
 	// buffer setup
-	unsigned int VBO, VAO; // EBO;
+	unsigned int VBO, VAO;
 	glGenVertexArrays(1, &VAO);
 	glGenBuffers(1, &VBO);
-	//glGenBuffers(1, &EBO);
 
 	glBindVertexArray(VAO);
-
-	//glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-	//glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 
 	glBindBuffer(GL_ARRAY_BUFFER, VBO);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
@@ -152,8 +111,7 @@ int main()
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	// generate the texture from our pixel data
-	// glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, frameWidth, frameHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE, frameData);
+	// generate the texture from our frame data
 	 glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, videoReader.getWidth(), videoReader.getHeight(), 0, GL_RGBA, GL_UNSIGNED_BYTE, frame_Data);
 
 	Shader textureShader("shaders/texture_shader.vert", "shaders/texture_shader.frag");
@@ -161,10 +119,6 @@ int main()
 	while (!glfwWindowShouldClose(window))
 	{
 		processInput(window);
-
-		// set up orthrographic projection for viewport
-		// int window_width, window_height;
-		// glfwGetFramebufferSize(window, &window_width, &window_height);
 		
 		// render
 		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
@@ -176,8 +130,6 @@ int main()
 		glBindVertexArray(VAO);
 		//glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 		glDrawArrays(GL_TRIANGLES, 0, 6);
-
-
 
 		//---------------------------
 		glfwSwapBuffers(window);

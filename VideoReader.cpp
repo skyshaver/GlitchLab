@@ -38,11 +38,14 @@ VideoReader::VideoReader(const char* fileName)
 	this->avPacket = av_packet_alloc();
 	if (!avPacket) { throw std::runtime_error("couldn't alloc packet"); }
 
+	// allocate frameBuffer
+	this->frameBuffer = new uint8_t[avCodecCtx->width * avCodecCtx->height * 4];
 	
 }
 
 VideoReader::~VideoReader()
 {
+	delete frameBuffer;
 	avformat_close_input(&avFormatCtx);
 	avformat_free_context(avFormatCtx);
 	avcodec_free_context(&avCodecCtx);
@@ -79,23 +82,23 @@ uint8_t* VideoReader::readFrame()
 	}
 	if (!swsScalerCtx) { throw std::runtime_error("couldn't create scaler ctx"); }
 
-	uint8_t* data = new uint8_t[avFrame->width * avFrame->height * 4];
-	uint8_t* dest[4] = { data, nullptr, nullptr, nullptr };
+	
+	uint8_t* dest[4] = { frameBuffer, nullptr, nullptr, nullptr };
 	int dest_linesize[4] = { avFrame->width * 4, 0, 0, 0 };
 	sws_scale(swsScalerCtx, avFrame->data, avFrame->linesize, 0, avFrame->height, dest, dest_linesize);
 	
-	return data;
+	return frameBuffer;
 
 }
 
 const int VideoReader::getHeight()
 {
-	if (!avFrame) { throw std::runtime_error("frame hasn't been filled yet"); }
-	return avFrame->height;
+	if (!avCodecParams) { throw std::runtime_error("frame hasn't not filled yet"); }
+	return avCodecParams->height;
 }
 
 const int VideoReader::getWidth()
 {
-	if(!avFrame) { throw std::runtime_error("frame hasn't been filled yet"); }
-	return avFrame->width;
+	if(!avCodecParams) { throw std::runtime_error("codec params not filled yet"); }
+	return avCodecParams->width;
 }
