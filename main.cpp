@@ -103,6 +103,9 @@ int main()
 	VideoReader videoReader("videos/butterfly.mp4");
 	// compile texture shaders
 	Shader textureShader("shaders/texture_shader.vert", "shaders/texture_shader.frag");
+	Shader textureShader_01("shaders/texture_shader.vert", "shaders/texture_shader_01.frag");
+	
+
 	
 	while (!glfwWindowShouldClose(window))
 	{
@@ -113,13 +116,30 @@ int main()
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		glBindTexture(GL_TEXTURE_2D, tex_handle);
-		textureShader.use();
+		if (int(glfwGetTime()) % 2 == 0)
+		{
+			textureShader_01.use();
+		}
+		else
+		{
+			textureShader.use();
+		}
+		
+		// change color uniform over time
+			/*float timeValue = glfwGetTime();
+			float colorValue = sin(timeValue) + 1.f;
+			textureShader.setFloat("colorValue", colorValue);*/
 
 		// apply the texture from our video reader frame data
 		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, videoReader.getWidth(), videoReader.getHeight(), 0,
 			GL_RGBA, GL_UNSIGNED_BYTE, videoReader.readFrame());
 		glBindVertexArray(VAO);
 		glDrawArrays(GL_TRIANGLES, 0, 6);
+
+		// change color uniform over time
+		float timeValue = glfwGetTime();
+		float colorValue = sin(timeValue) + 1.f;
+		textureShader.setFloat("colorValue", colorValue);
 
 		// crude sync
 		static bool firstFrame = true;

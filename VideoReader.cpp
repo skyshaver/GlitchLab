@@ -99,7 +99,7 @@ uint8_t* VideoReader::readFrame()
 
 const int VideoReader::getHeight()
 {
-	if (!avCodecParams) { throw std::runtime_error("frame hasn't not filled yet"); }
+	if (!avCodecParams) { throw std::runtime_error("codec params not filled yet"); }
 	return avCodecParams->height;
 }
 
