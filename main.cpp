@@ -59,10 +59,6 @@ int main()
 		return -1;
 	}
 
-	// init videoreader and get one frame
-	VideoReader videoReader("videos/butterfly.mp4");
-	uint8_t* frame_Data = videoReader.readFrame();
-
 	// vertices for rectangle inverted but mirrored?
 	float vertices[] = {
 		// positions          // colors           // texture coords
@@ -77,7 +73,7 @@ int main()
 		 //0.5f, -0.5f, 0.0f,   0.0f, 1.0f, 0.0f,   1.0f, 0.0f,   // bottom right
 	};
 
-	// buffer setup
+	// texture buffer setup
 	unsigned int VBO, VAO;
 	glGenVertexArrays(1, &VAO);
 	glGenBuffers(1, &VBO);
@@ -97,25 +93,22 @@ int main()
 	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
 	glEnableVertexAttribArray(2);
 
-
 	// texture setup for viewport
 	GLuint tex_handle;
 	glGenTextures(1, &tex_handle);
 	glBindTexture(GL_TEXTURE_2D, tex_handle);
 	
-
-	//float borderColor[] = { 1.0f, 1.0f, 1.0f, 1.0f };
-	//glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, borderColor);
 	// set the texture wrapping/filtering options (on the currently bound texture object)
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	// generate the texture from our frame data
-	 glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, videoReader.getWidth(), videoReader.getHeight(), 0, GL_RGBA, GL_UNSIGNED_BYTE, frame_Data);
-
+	
+	// init videoreader and load video
+	VideoReader videoReader("videos/butterfly.mp4");
+	// compile texture shaders
 	Shader textureShader("shaders/texture_shader.vert", "shaders/texture_shader.frag");
-
+	
 	while (!glfwWindowShouldClose(window))
 	{
 		processInput(window);
@@ -126,7 +119,11 @@ int main()
 
 		glBindTexture(GL_TEXTURE_2D, tex_handle);
 		textureShader.use();
-		
+
+		// apply the texture from our video reader frame data
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, videoReader.getWidth(), videoReader.getHeight(), 0,
+			GL_RGBA, GL_UNSIGNED_BYTE, videoReader.readFrame());
+
 		glBindVertexArray(VAO);
 		//glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 		glDrawArrays(GL_TRIANGLES, 0, 6);

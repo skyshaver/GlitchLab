@@ -11,7 +11,7 @@ VideoReader::VideoReader(const char* fileName)
 	}
 
 	// find first valid video stream
-	for (int i = 0; i < avFormatCtx->nb_streams; ++i)
+	for (uint8_t i = 0; i < avFormatCtx->nb_streams; ++i)
 	{
 		auto stream = avFormatCtx->streams[i];
 		avCodecParams = avFormatCtx->streams[i]->codecpar;
