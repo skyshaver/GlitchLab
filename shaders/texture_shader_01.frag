@@ -1,4 +1,5 @@
 #version 330 core
+
 out vec4 FragColor;
 
 in vec3 ourColor;
@@ -7,13 +8,23 @@ in vec2 TexCoord;
 // texture sampler
 uniform sampler2D texture1;
 
-uniform float colorValue;
+uniform float u_time;
+uniform vec2 u_resolution;
+
 
 void main()
 {
-	// FragColor = texture(texture1, TexCoord);
-	FragColor = texture(texture1, TexCoord) * vec4( ourColor.x,
-													ourColor.y,
-													ourColor.z,
-													 1.0);
+	// rgb change over time
+	// FragColor = texture(texture1, TexCoord) * vec4(abs(sin(u_time / 3)),
+	// 											   abs(sin(u_time / 2)),
+	// 											   abs(sin(u_time / 10)),
+	// 											   1.000);
+	
+	// rainbow spread over texture
+	// FragColor = texture(texture1, TexCoord) * vec4(ourColor, 1.0);
+	
+
+	// vec2 st = gl_FragCoord.xy / u_resolution;
+	FragColor = texture(texture1, TexCoord) * vec4(u_resolution.x, 0.0, 0.0, 1.0);
+	
 }

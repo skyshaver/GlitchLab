@@ -97,13 +97,13 @@ uint8_t* VideoReader::readFrame()
 
 }
 
-const int VideoReader::getHeight()
+int VideoReader::getHeight() const
 {
 	if (!avCodecParams) { throw std::runtime_error("codec params not filled yet"); }
 	return avCodecParams->height;
 }
 
-const int VideoReader::getWidth()
+int VideoReader::getWidth() const
 {
 	if(!avCodecParams) { throw std::runtime_error("codec params not filled yet"); }
 	return avCodecParams->width;

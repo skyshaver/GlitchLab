@@ -57,14 +57,14 @@ int main()
 	// vertices for rectangle, texture mapping inverted but image is mirrored?
 	float vertices[] = {
 		// positions          // colors           // texture coords
-		 0.75f,  0.75f, 0.0f,   1.0f, 0.0f, 0.0f,   0.0f, 0.0f,   // top right
-		 0.75f, -0.75f, 0.0f,   0.0f, 1.0f, 0.0f,   0.0f, 1.0f,   // bottom right
+		 1.f,  1.f, 0.0f,   1.0f, 0.0f, 0.0f,   0.0f, 0.0f,   // top right
+		 1.f, -1.f, 0.0f,   0.0f, 1.0f, 0.0f,   0.0f, 1.0f,   // bottom right
 		//-0.5f, -0.5f, 0.0f,   0.0f, 0.0f, 1.0f,   0.0f, 0.0f,   // bottom left
-		-0.75f,  0.75f, 0.0f,   1.0f, 1.0f, 0.0f,   1.0f, 0.0f,    // top left 
+		-1.f,  1.f, 0.0f,   1.0f, 1.0f, 0.0f,   1.0f, 0.0f,    // top left 
 
-		 0.75f, -0.75f, 0.0f,   0.0f, 1.0f, 0.0f,   0.0f, 1.0f,   // bottom right
-		-0.75f, -0.75f, 0.0f,   0.0f, 0.0f, 1.0f,   1.0f, 1.0f,   // bottom left
-		-0.75f,  0.75f, 0.0f,   1.0f, 1.0f, 0.0f,   1.0f, 0.0f,    // top left 
+		 1.f, -1.f, 0.0f,   0.0f, 1.0f, 0.0f,   0.0f, 1.0f,   // bottom right
+		-1.f, -1.f, 0.0f,   0.0f, 0.0f, 1.0f,   1.0f, 1.0f,   // bottom left
+		-1.f,  1.f, 0.0f,   1.0f, 1.0f, 0.0f,   1.0f, 0.0f,    // top left 
 		 //0.5f, -0.5f, 0.0f,   0.0f, 1.0f, 0.0f,   1.0f, 0.0f,   // bottom right
 	};
 
@@ -104,9 +104,11 @@ int main()
 	// compile texture shaders
 	Shader textureShader("shaders/texture_shader.vert", "shaders/texture_shader.frag");
 	Shader textureShader_01("shaders/texture_shader.vert", "shaders/texture_shader_01.frag");
-	
 
-	
+	// glm::vec2 u_resolution = { float(videoReader.getWidth()), float(videoReader.getHeight()) };
+	glm::vec2 u_resolution = { 1.f, 0.f };
+	textureShader_01.setVec2("u_resolution", u_resolution);
+
 	while (!glfwWindowShouldClose(window))
 	{
 		processInput(window);
@@ -116,19 +118,23 @@ int main()
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		glBindTexture(GL_TEXTURE_2D, tex_handle);
-		if (int(glfwGetTime()) % 2 == 0)
+		/*if (int(glfwGetTime()) % 2 == 0)
 		{
 			textureShader_01.use();
 		}
 		else
 		{
 			textureShader.use();
-		}
+		}*/
+		textureShader_01.use();
+		// send time uniform
+		static float startTime = glfwGetTime();
+		float u_time = glfwGetTime() - startTime;
+		textureShader_01.setFloat("u_time", u_time);
+
+		glm::vec2 u_resolution = { 1.f, 0.f };
+		textureShader_01.setVec2("u_resolution", u_resolution);
 		
-		// change color uniform over time
-			/*float timeValue = glfwGetTime();
-			float colorValue = sin(timeValue) + 1.f;
-			textureShader.setFloat("colorValue", colorValue);*/
 
 		// apply the texture from our video reader frame data
 		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, videoReader.getWidth(), videoReader.getHeight(), 0,
@@ -136,10 +142,7 @@ int main()
 		glBindVertexArray(VAO);
 		glDrawArrays(GL_TRIANGLES, 0, 6);
 
-		// change color uniform over time
-		float timeValue = glfwGetTime();
-		float colorValue = sin(timeValue) + 1.f;
-		textureShader.setFloat("colorValue", colorValue);
+		
 
 		// crude sync
 		static bool firstFrame = true;

@@ -31,8 +31,8 @@ public:
 	~VideoReader();
 
 	uint8_t* readFrame();
-	const int getHeight();
-	const int getWidth();
+	int getHeight() const;
+	int getWidth() const;
 	double returnPtsInSecs();
 
 };
