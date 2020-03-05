@@ -24,7 +24,8 @@ void main()
 	// FragColor = texture(texture1, TexCoord) * vec4(ourColor, 1.0);
 	
 
-	// vec2 st = gl_FragCoord.xy / u_resolution;
-	FragColor = texture(texture1, TexCoord) * vec4(u_resolution.x, 0.0, 0.0, 1.0);
+	// another way to spread rainbow over texture
+	vec2 st = gl_FragCoord.xy / u_resolution;
+	FragColor = texture(texture1, TexCoord) * vec4(st.x, st.y, 0.0, 1.0);
 	
 }

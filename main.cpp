@@ -105,9 +105,7 @@ int main()
 	Shader textureShader("shaders/texture_shader.vert", "shaders/texture_shader.frag");
 	Shader textureShader_01("shaders/texture_shader.vert", "shaders/texture_shader_01.frag");
 
-	// glm::vec2 u_resolution = { float(videoReader.getWidth()), float(videoReader.getHeight()) };
-	glm::vec2 u_resolution = { 1.f, 0.f };
-	textureShader_01.setVec2("u_resolution", u_resolution);
+	glm::vec2 u_resolution = { float(videoReader.getWidth()), float(videoReader.getHeight()) };
 
 	while (!glfwWindowShouldClose(window))
 	{
@@ -132,7 +130,7 @@ int main()
 		float u_time = glfwGetTime() - startTime;
 		textureShader_01.setFloat("u_time", u_time);
 
-		glm::vec2 u_resolution = { 1.f, 0.f };
+		//glm::vec2 u_resolution = { 1.f, 0.f };
 		textureShader_01.setVec2("u_resolution", u_resolution);
 		
 
