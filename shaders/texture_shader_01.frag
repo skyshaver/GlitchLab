@@ -10,6 +10,7 @@ uniform sampler2D texture1;
 
 uniform float u_time;
 uniform vec2 u_resolution;
+uniform vec2 u_mousePos;
 
 
 void main()
@@ -25,7 +26,11 @@ void main()
 	
 
 	// another way to spread rainbow over texture
-	vec2 st = gl_FragCoord.xy / u_resolution;
-	FragColor = texture(texture1, TexCoord) * vec4(st.x, st.y, 0.0, 1.0);
+	// vec2 st = gl_FragCoord.xy / u_resolution;
+	// FragColor = texture(texture1, TexCoord) * vec4(st.x, st.y, 0.0, 1.0);
 	
+	// use mousePos to create R G values
+	vec2 mp = u_mousePos / u_resolution;
+	FragColor = texture(texture1, TexCoord) * vec4(mp, 0.0, 1.0);
+
 }

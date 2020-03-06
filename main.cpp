@@ -17,6 +17,11 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height)
 	glViewport(0, 0, width, height);
 }
 
+static void cursor_position_callback(GLFWwindow* window, double xpos, double ypos)
+{
+
+}
+
 // temp setup glfw keycallback to use esc for exit
 void processInput(GLFWwindow* window)
 {
@@ -47,6 +52,7 @@ int main()
 
 	glfwMakeContextCurrent(window);
 	glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
+	glfwSetCursorPosCallback(window, cursor_position_callback);
 
 	if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
 	{
@@ -103,10 +109,10 @@ int main()
 	VideoReader videoReader("videos/butterfly.mp4");
 	// compile texture shaders
 	Shader textureShader("shaders/texture_shader.vert", "shaders/texture_shader.frag");
-	Shader textureShader_01("shaders/texture_shader.vert", "shaders/texture_shader_01.frag");
-
-	glm::vec2 u_resolution = { float(videoReader.getWidth()), float(videoReader.getHeight()) };
-
+	Shader textureShader_01("shaders/texture_shader.vert", "shaders/border_shader.frag");
+	// uniform setup
+	int currentWw, currentWh;
+	double mouseXpos, mouseYpos;
 	while (!glfwWindowShouldClose(window))
 	{
 		processInput(window);
@@ -125,14 +131,21 @@ int main()
 			textureShader.use();
 		}*/
 		textureShader_01.use();
-		// send time uniform
+
+		// pass elapsed time uniform
 		static float startTime = glfwGetTime();
 		float u_time = glfwGetTime() - startTime;
 		textureShader_01.setFloat("u_time", u_time);
 
-		//glm::vec2 u_resolution = { 1.f, 0.f };
+		// screen position uniform
+		glfwGetWindowSize(window, &currentWw, &currentWh);
+		glm::vec2 u_resolution = { float(currentWw), float(currentWh) };
 		textureShader_01.setVec2("u_resolution", u_resolution);
-		
+
+		// pass mouse position uniform
+		glfwGetCursorPos(window, &mouseXpos, &mouseYpos);
+		glm::vec2 u_mousePos = { mouseXpos, mouseYpos };
+		textureShader_01.setVec2("u_mousePos", u_mousePos);
 
 		// apply the texture from our video reader frame data
 		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, videoReader.getWidth(), videoReader.getHeight(), 0,
@@ -140,9 +153,7 @@ int main()
 		glBindVertexArray(VAO);
 		glDrawArrays(GL_TRIANGLES, 0, 6);
 
-		
-
-		// crude sync
+		// crude sync for playback
 		static bool firstFrame = true;
 		if (firstFrame)
 		{
