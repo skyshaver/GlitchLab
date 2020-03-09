@@ -30,6 +30,9 @@
     <ClCompile Include="VideoReader.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="parseCommandLineArgs.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Shader.h">

@@ -3,6 +3,8 @@
 #define GLFW_INCLUDE_NONE
 #include <GLFW/glfw3.h>
 
+#include <tuple>
+
 #include "Shader.h"
 #include "VideoReader.h"
 
@@ -22,14 +24,41 @@ static void cursor_position_callback(GLFWwindow* window, double xpos, double ypo
 
 }
 
+// store previous window size
+int wXPos, wYPos, wW, wH;
+static bool fullscreen = false;
 // temp setup glfw keycallback to use esc for exit
 void processInput(GLFWwindow* window)
 {
-	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
-		glfwSetWindowShouldClose(window, true);
+	// esc to exit
+	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) { glfwSetWindowShouldClose(window, true); }
+
+	// toggle full screen
+	if (glfwGetKey(window, GLFW_KEY_F) == GLFW_PRESS && !fullscreen)
+	{
+		// capture state of window
+		glfwGetWindowPos(window, &wXPos, &wYPos);
+		glfwGetWindowSize(window, &wW, &wH);
+		// switch to exclusive fullscreen
+		GLFWmonitor* monitor = glfwGetPrimaryMonitor();
+		const GLFWvidmode* mode = glfwGetVideoMode(monitor);
+		glfwSetWindowMonitor(window, monitor, 0, 0, mode->width, mode->height, 0);
+		fullscreen = true;
+	}
+
+	if (glfwGetKey(window, GLFW_KEY_R) == GLFW_PRESS && fullscreen)
+	{
+		GLFWmonitor* monitor = glfwGetPrimaryMonitor();
+		// switch back to previous window state
+		glfwSetWindowMonitor(window, nullptr, wXPos, wYPos, wW, wH, 0);
+		fullscreen = false;
+	}
+
 }
 
-int main()
+std::tuple<bool, double> parseCommandLineArgs(int argc, char* argv[]);
+
+int main(int argc, char* argv[])
 {
 	if (!glfwInit())
 	{
@@ -106,13 +135,28 @@ int main()
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	
 	// init videoreader and load video
-	VideoReader videoReader("videos/butterfly.mp4");
+	VideoReader videoReader("videos/treetops.mp4");
 	// compile texture shaders
 	Shader textureShader("shaders/texture_shader.vert", "shaders/texture_shader.frag");
-	Shader textureShader_01("shaders/texture_shader.vert", "shaders/border_shader.frag");
+	Shader textureShader_01("shaders/glitch_shader.vert", "shaders/texture_shader.frag");
 	// uniform setup
 	int currentWw, currentWh;
 	double mouseXpos, mouseYpos;
+
+	// get clargs
+	double quitTimer = 60.0;
+	bool isFullScreen = false;
+	std::tie(isFullScreen, quitTimer) = parseCommandLineArgs(argc, argv);
+
+	if (isFullScreen)
+	{
+		// switch to exclusive fullscreen
+		GLFWmonitor* monitor = glfwGetPrimaryMonitor();
+		const GLFWvidmode* mode = glfwGetVideoMode(monitor);
+		glfwSetWindowMonitor(window, monitor, 0, 0, mode->width, mode->height, 0);
+		isFullScreen = false;
+	}
+
 	while (!glfwWindowShouldClose(window))
 	{
 		processInput(window);
@@ -122,20 +166,22 @@ int main()
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		glBindTexture(GL_TEXTURE_2D, tex_handle);
-		/*if (int(glfwGetTime()) % 2 == 0)
+		if (int(glfwGetTime()) % 2 == 0)
 		{
 			textureShader_01.use();
 		}
 		else
 		{
 			textureShader.use();
-		}*/
-		textureShader_01.use();
+		}
+		// textureShader_01.use();
 
 		// pass elapsed time uniform
 		static float startTime = glfwGetTime();
 		float u_time = glfwGetTime() - startTime;
 		textureShader_01.setFloat("u_time", u_time);
+		// use quit timer returned from clargs to close window
+		if(u_time > quitTimer){ glfwSetWindowShouldClose(window, true); }
 
 		// screen position uniform
 		glfwGetWindowSize(window, &currentWw, &currentWh);
