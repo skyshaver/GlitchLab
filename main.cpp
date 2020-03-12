@@ -42,7 +42,7 @@ void processInput(GLFWwindow* window)
 		// switch to exclusive fullscreen
 		GLFWmonitor* monitor = glfwGetPrimaryMonitor();
 		const GLFWvidmode* mode = glfwGetVideoMode(monitor);
-		glfwSetWindowMonitor(window, monitor, 0, 0, mode->width, mode->height, 0);
+		glfwSetWindowMonitor(window, monitor, 0, 0, mode->width, mode->height, mode->refreshRate);
 		fullscreen = true;
 	}
 
@@ -56,9 +56,9 @@ void processInput(GLFWwindow* window)
 
 }
 
-std::tuple<bool, double> parseCommandLineArgs(int argc, char* argv[]);
+std::tuple<bool, double> parseCommandLineArgs(int argc, const char** argv);
 
-int main(int argc, char* argv[])
+int main(int argc, const char** argv)
 {
 	if (!glfwInit())
 	{
@@ -70,7 +70,10 @@ int main(int argc, char* argv[])
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-	GLFWwindow* window = glfwCreateWindow(WWIDTH, WHEIGHT, "hello", nullptr, nullptr);
+	// don't show window till after initial render
+	glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE);
+
+	GLFWwindow* window = glfwCreateWindow(WWIDTH, WHEIGHT, "Glitch Lab", nullptr, nullptr);
 
 	if (window == nullptr)
 	{
@@ -82,6 +85,8 @@ int main(int argc, char* argv[])
 	glfwMakeContextCurrent(window);
 	glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 	glfwSetCursorPosCallback(window, cursor_position_callback);
+	// hide mouse pointer
+	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
 
 	if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
 	{
@@ -134,8 +139,9 @@ int main(int argc, char* argv[])
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	
+	
 	// init videoreader and load video
-	VideoReader videoReader("videos/treetops.mp4");
+	VideoReader videoReader("videos/face_00.mp4");
 	// compile texture shaders
 	Shader textureShader("shaders/texture_shader.vert", "shaders/texture_shader.frag");
 	Shader textureShader_01("shaders/glitch_shader.vert", "shaders/texture_shader.frag");
@@ -154,8 +160,9 @@ int main(int argc, char* argv[])
 		GLFWmonitor* monitor = glfwGetPrimaryMonitor();
 		const GLFWvidmode* mode = glfwGetVideoMode(monitor);
 		glfwSetWindowMonitor(window, monitor, 0, 0, mode->width, mode->height, 0);
-		isFullScreen = false;
+		// isFullScreen = false;
 	}
+	
 
 	while (!glfwWindowShouldClose(window))
 	{
@@ -212,7 +219,9 @@ int main(int argc, char* argv[])
 		}
 		// end sync
 
-
+		// show window after first render
+		glfwShowWindow(window);
+		
 		//---------------------------
 		glfwSwapBuffers(window);
 		glfwPollEvents();
