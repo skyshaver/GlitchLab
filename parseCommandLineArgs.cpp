@@ -9,10 +9,9 @@ std::tuple<bool, double> parseCommandLineArgs(int argc, const char** argv)
 	bool isFullScreen = true;
 	double timer = 60.0;
 	bool show_help = false;
-	//if (argc < 2) { return { isFullScreen, timer }; }
 
 	auto cli
-		= lyra::help(show_help)
+		= lyra::help(show_help).description("Play video with glitch filters, cl args for fullscreen and a run timer")
 		| lyra::opt(isFullScreen)
 			["-f"]["--fullscreen"]("Use '-f' or '--fullscreen' to start in exclusive fullscreen")
 		| lyra::opt(timer, "timer")
@@ -20,9 +19,11 @@ std::tuple<bool, double> parseCommandLineArgs(int argc, const char** argv)
 	
 	auto result = cli.parse({ argc, argv });
 
+	
+
 	if(!result)
 	{
-		std::cerr << "Error in command line: " << result.errorMessage() << std::endl;
+		std::cerr << "Error in command line: " << result.errorMessage() << " to see the help type -?" << std::endl;
 		std::cerr << cli << "\n"; // <1>
 		std::exit(1);
 	}

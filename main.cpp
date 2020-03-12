@@ -145,7 +145,7 @@ int main(int argc, const char** argv)
 	// compile texture shaders
 	Shader textureShader("shaders/texture_shader.vert", "shaders/texture_shader.frag");
 	Shader textureShader_01("shaders/glitch_shader.vert", "shaders/texture_shader.frag");
-	// uniform setup
+	// shader uniform setup
 	int currentWw, currentWh;
 	double mouseXpos, mouseYpos;
 
@@ -156,11 +156,10 @@ int main(int argc, const char** argv)
 
 	if (isFullScreen)
 	{
-		// switch to exclusive fullscreen
+		// switch to exclusive fullscreen, the actual display of fullscreen/ any screen is put off till the first render is done
 		GLFWmonitor* monitor = glfwGetPrimaryMonitor();
 		const GLFWvidmode* mode = glfwGetVideoMode(monitor);
 		glfwSetWindowMonitor(window, monitor, 0, 0, mode->width, mode->height, 0);
-		// isFullScreen = false;
 	}
 	
 
@@ -173,6 +172,7 @@ int main(int argc, const char** argv)
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		glBindTexture(GL_TEXTURE_2D, tex_handle);
+
 		if (int(glfwGetTime()) % 2 == 0)
 		{
 			textureShader_01.use();
@@ -187,6 +187,7 @@ int main(int argc, const char** argv)
 		static float startTime = glfwGetTime();
 		float u_time = glfwGetTime() - startTime;
 		textureShader_01.setFloat("u_time", u_time);
+
 		// use quit timer returned from clargs to close window
 		if(u_time > quitTimer){ glfwSetWindowShouldClose(window, true); }
 
@@ -206,7 +207,7 @@ int main(int argc, const char** argv)
 		glBindVertexArray(VAO);
 		glDrawArrays(GL_TRIANGLES, 0, 6);
 
-		// crude sync for playback
+		// crude video sync for playback // TODO improve this sync function
 		static bool firstFrame = true;
 		if (firstFrame)
 		{
@@ -219,7 +220,7 @@ int main(int argc, const char** argv)
 		}
 		// end sync
 
-		// show window after first render
+		// show window after first render to help avoid glitching
 		glfwShowWindow(window);
 		
 		//---------------------------
