@@ -19,8 +19,23 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height)
 	glViewport(0, 0, width, height);
 }
 
+// variables to hide mouse when program is first launched
+double prevXpos = 0.0;
+double prevYpos = 0.0;
+bool firstMouseMove = true;
 static void cursor_position_callback(GLFWwindow* window, double xpos, double ypos)
 {
+	if (firstMouseMove)
+	{
+		prevXpos = xpos;
+		prevYpos = ypos;
+		firstMouseMove = false;
+	}
+
+	if (prevXpos != xpos || prevYpos != ypos)
+	{
+		glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+	}
 
 }
 
@@ -94,17 +109,17 @@ int main(int argc, const char** argv)
 		return -1;
 	}
 
-	// vertices for rectangle, texture mapping inverted but image is mirrored?
+	// vertices for rectangle, texture mapping deals with OGL flipping the image
 	float vertices[] = {
 		// positions          // colors           // texture coords
-		 1.f,  1.f, 0.0f,   1.0f, 0.0f, 0.0f,   0.0f, 0.0f,   // top right
-		 1.f, -1.f, 0.0f,   0.0f, 1.0f, 0.0f,   0.0f, 1.0f,   // bottom right
+		 1.f,  1.f, 0.0f,   1.0f, 0.0f, 0.0f,   1.0f, 0.0f,   // top right
+		 1.f, -1.f, 0.0f,   0.0f, 1.0f, 0.0f,   1.0f, 1.0f,   // bottom right
 		//-0.5f, -0.5f, 0.0f,   0.0f, 0.0f, 1.0f,   0.0f, 0.0f,   // bottom left
 		-1.f,  1.f, 0.0f,   1.0f, 1.0f, 0.0f,   1.0f, 0.0f,    // top left 
 
-		 1.f, -1.f, 0.0f,   0.0f, 1.0f, 0.0f,   0.0f, 1.0f,   // bottom right
-		-1.f, -1.f, 0.0f,   0.0f, 0.0f, 1.0f,   1.0f, 1.0f,   // bottom left
-		-1.f,  1.f, 0.0f,   1.0f, 1.0f, 0.0f,   1.0f, 0.0f,    // top left 
+		 1.f, -1.f, 0.0f,   0.0f, 1.0f, 0.0f,   1.0f, 1.0f,   // bottom right
+		-1.f, -1.f, 0.0f,   0.0f, 0.0f, 1.0f,   0.0f, 1.0f,   // bottom left
+		-1.f,  1.f, 0.0f,   1.0f, 1.0f, 0.0f,   0.0f, 0.0f,    // top left 
 		 //0.5f, -0.5f, 0.0f,   0.0f, 1.0f, 0.0f,   1.0f, 0.0f,   // bottom right
 	};
 
@@ -184,8 +199,8 @@ int main(int argc, const char** argv)
 		// textureShader_01.use();
 
 		// pass elapsed time uniform
-		static float startTime = glfwGetTime();
-		float u_time = glfwGetTime() - startTime;
+		static double startTime = glfwGetTime();
+		float u_time = static_cast<float>(glfwGetTime() - startTime);
 		textureShader_01.setFloat("u_time", u_time);
 
 		// use quit timer returned from clargs to close window
@@ -193,7 +208,7 @@ int main(int argc, const char** argv)
 
 		// screen position uniform
 		glfwGetWindowSize(window, &currentWw, &currentWh);
-		glm::vec2 u_resolution = { float(currentWw), float(currentWh) };
+		glm::vec2 u_resolution = { static_cast<float>(currentWw), static_cast<float>(currentWh) };
 		textureShader_01.setVec2("u_resolution", u_resolution);
 
 		// pass mouse position uniform
