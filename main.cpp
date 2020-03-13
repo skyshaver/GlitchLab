@@ -109,34 +109,28 @@ int main(int argc, const char** argv)
 		return -1;
 	}
 
-	// vertices for rectangle, texture mapping inverted but image is mirrored?
-	//float vertices[] = {
-	//	// positions          // colors           // texture coords
-	//	 1.f,  1.f, 0.0f,   1.0f, 0.0f, 0.0f,   0.0f, 0.0f,   // top right
-	//	 1.f, -1.f, 0.0f,   0.0f, 1.0f, 0.0f,   0.0f, 1.0f,   // bottom right
-	//	//-0.5f, -0.5f, 0.0f,   0.0f, 0.0f, 1.0f,   0.0f, 0.0f,   // bottom left
-	//	-1.f,  1.f, 0.0f,   1.0f, 1.0f, 0.0f,   1.0f, 0.0f,    // top left 
-
-	//	 1.f, -1.f, 0.0f,   0.0f, 1.0f, 0.0f,   0.0f, 1.0f,   // bottom right
-	//	-1.f, -1.f, 0.0f,   0.0f, 0.0f, 1.0f,   1.0f, 1.0f,   // bottom left
-	//	-1.f,  1.f, 0.0f,   1.0f, 1.0f, 0.0f,   1.0f, 0.0f,    // top left 
-	//	 //0.5f, -0.5f, 0.0f,   0.0f, 1.0f, 0.0f,   1.0f, 0.0f,   // bottom right
-	//};
-
-	// vertices for rectangle, texture mapping deals with OGL flipping the image but now half the image is distorted?
+	// vertices for rectangle as two triangles, texture mapping deals with OGL flipping the image
 	float vertices[] = {
 		// positions          // colors           // texture coords
 		 1.f,  1.f, 0.0f,   1.0f, 0.0f, 0.0f,   1.0f, 0.0f,   // top right
 		 1.f, -1.f, 0.0f,   0.0f, 1.0f, 0.0f,   1.0f, 1.0f,   // bottom right
-		//-0.5f, -0.5f, 0.0f,   0.0f, 0.0f, 1.0f,   0.0f, 0.0f,   // bottom left
 		-1.f,  1.f, 0.0f,   1.0f, 1.0f, 0.0f,   0.0f, 0.0f,    // top left 
 
 		 1.f, -1.f, 0.0f,   0.0f, 1.0f, 0.0f,   1.0f, 1.0f,   // bottom right
 		-1.f, -1.f, 0.0f,   0.0f, 0.0f, 1.0f,   0.0f, 1.0f,   // bottom left
 		-1.f,  1.f, 0.0f,   1.0f, 1.0f, 0.0f,   0.0f, 0.0f,    // top left 
-		 //0.5f, -0.5f, 0.0f,   0.0f, 1.0f, 0.0f,   1.0f, 0.0f,   // bottom right
+		 
 	};
 
+	
+	// just the four corners
+	//float vertices[] = {
+	//	// positions          // colors           // texture coords
+	//	 1.0f,  1.f, 0.0f,   1.0f, 0.0f, 0.0f,   1.0f, 0.0f,   // top right
+	//	 1.0f, -1.f, 0.0f,   0.0f, 1.0f, 0.0f,   1.0f, 1.0f,   // bottom right
+	//	-1.0f,  1.f, 0.0f,   1.0f, 1.0f, 0.0f,   0.0f, 0.0f,    // top left 
+	//	-1.f,  -1.f, 0.0f,   0.0f, 0.0f, 1.0f,   0.0f, 1.0f,   // bottom left
+	//};
 
 
 	// texture buffer setup
@@ -176,7 +170,7 @@ int main(int argc, const char** argv)
 
 	// compile texture shaders
 	Shader textureShader_01("shaders/texture_shader.vert", "shaders/texture_shader.frag");
-	Shader textureShader_("shaders/glitch_shader.vert", "shaders/texture_shader.frag");
+	Shader textureShader("shaders/glitch_shader.vert", "shaders/glitch_shader.frag");
 
 	// shader uniform setup
 	int currentWw, currentWh;
@@ -192,7 +186,7 @@ int main(int argc, const char** argv)
 		// switch to exclusive fullscreen, the actual display of fullscreen/ any screen is put off till the first render is done
 		GLFWmonitor* monitor = glfwGetPrimaryMonitor();
 		const GLFWvidmode* mode = glfwGetVideoMode(monitor);
-		glfwSetWindowMonitor(window, monitor, 0, 0, mode->width, mode->height, 0);
+		glfwSetWindowMonitor(window, monitor, 0, 0, mode->width, mode->height, mode->refreshRate);
 	}
 	
 
