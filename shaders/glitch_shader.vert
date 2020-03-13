@@ -34,7 +34,7 @@ void main()
 
 	// create rect
 	vec2 bl = vec2(0.0, 0.0);
-    vec2 tr = vec2(0.1, 1.);
+    vec2 tr = vec2(1., 1.);
 
     if(isinrec(bl, tr, st))
         ourTexCoord = vec2(abs(sin(u_time)), aTexCoord.y);

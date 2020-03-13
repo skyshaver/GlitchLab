@@ -6,7 +6,7 @@
 
 std::tuple<bool, double> parseCommandLineArgs(int argc, const char** argv)
 {
-	bool isFullScreen = true;
+	bool isFullScreen = false;
 	double timer = 60.0;
 	bool show_help = false;
 

@@ -109,19 +109,35 @@ int main(int argc, const char** argv)
 		return -1;
 	}
 
-	// vertices for rectangle, texture mapping deals with OGL flipping the image
+	// vertices for rectangle, texture mapping inverted but image is mirrored?
+	//float vertices[] = {
+	//	// positions          // colors           // texture coords
+	//	 1.f,  1.f, 0.0f,   1.0f, 0.0f, 0.0f,   0.0f, 0.0f,   // top right
+	//	 1.f, -1.f, 0.0f,   0.0f, 1.0f, 0.0f,   0.0f, 1.0f,   // bottom right
+	//	//-0.5f, -0.5f, 0.0f,   0.0f, 0.0f, 1.0f,   0.0f, 0.0f,   // bottom left
+	//	-1.f,  1.f, 0.0f,   1.0f, 1.0f, 0.0f,   1.0f, 0.0f,    // top left 
+
+	//	 1.f, -1.f, 0.0f,   0.0f, 1.0f, 0.0f,   0.0f, 1.0f,   // bottom right
+	//	-1.f, -1.f, 0.0f,   0.0f, 0.0f, 1.0f,   1.0f, 1.0f,   // bottom left
+	//	-1.f,  1.f, 0.0f,   1.0f, 1.0f, 0.0f,   1.0f, 0.0f,    // top left 
+	//	 //0.5f, -0.5f, 0.0f,   0.0f, 1.0f, 0.0f,   1.0f, 0.0f,   // bottom right
+	//};
+
+	// vertices for rectangle, texture mapping deals with OGL flipping the image but now half the image is distorted?
 	float vertices[] = {
 		// positions          // colors           // texture coords
 		 1.f,  1.f, 0.0f,   1.0f, 0.0f, 0.0f,   1.0f, 0.0f,   // top right
 		 1.f, -1.f, 0.0f,   0.0f, 1.0f, 0.0f,   1.0f, 1.0f,   // bottom right
 		//-0.5f, -0.5f, 0.0f,   0.0f, 0.0f, 1.0f,   0.0f, 0.0f,   // bottom left
-		-1.f,  1.f, 0.0f,   1.0f, 1.0f, 0.0f,   1.0f, 0.0f,    // top left 
+		-1.f,  1.f, 0.0f,   1.0f, 1.0f, 0.0f,   0.0f, 0.0f,    // top left 
 
 		 1.f, -1.f, 0.0f,   0.0f, 1.0f, 0.0f,   1.0f, 1.0f,   // bottom right
 		-1.f, -1.f, 0.0f,   0.0f, 0.0f, 1.0f,   0.0f, 1.0f,   // bottom left
 		-1.f,  1.f, 0.0f,   1.0f, 1.0f, 0.0f,   0.0f, 0.0f,    // top left 
 		 //0.5f, -0.5f, 0.0f,   0.0f, 1.0f, 0.0f,   1.0f, 0.0f,   // bottom right
 	};
+
+
 
 	// texture buffer setup
 	unsigned int VBO, VAO;
@@ -157,9 +173,11 @@ int main(int argc, const char** argv)
 	
 	// init videoreader and load video
 	VideoReader videoReader("videos/face_00.mp4");
+
 	// compile texture shaders
-	Shader textureShader("shaders/texture_shader.vert", "shaders/texture_shader.frag");
-	Shader textureShader_01("shaders/glitch_shader.vert", "shaders/texture_shader.frag");
+	Shader textureShader_01("shaders/texture_shader.vert", "shaders/texture_shader.frag");
+	Shader textureShader_("shaders/glitch_shader.vert", "shaders/texture_shader.frag");
+
 	// shader uniform setup
 	int currentWw, currentWh;
 	double mouseXpos, mouseYpos;
@@ -188,15 +206,15 @@ int main(int argc, const char** argv)
 
 		glBindTexture(GL_TEXTURE_2D, tex_handle);
 
-		if (int(glfwGetTime()) % 2 == 0)
+		/*if (int(glfwGetTime()) % 2 == 0)
 		{
 			textureShader_01.use();
 		}
 		else
 		{
 			textureShader.use();
-		}
-		// textureShader_01.use();
+		}*/
+		textureShader_01.use();
 
 		// pass elapsed time uniform
 		static double startTime = glfwGetTime();
