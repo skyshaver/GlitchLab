@@ -109,18 +109,18 @@ int main(int argc, const char** argv)
 		return -1;
 	}
 
-	// vertices for rectangle as two triangles, texture mapping deals with OGL flipping the image
-	float vertices[] = {
-		// positions          // colors           // texture coords
-		 1.f,  1.f, 0.0f,   1.0f, 0.0f, 0.0f,   1.0f, 0.0f,   // top right
-		 1.f, -1.f, 0.0f,   0.0f, 1.0f, 0.0f,   1.0f, 1.0f,   // bottom right
-		-1.f,  1.f, 0.0f,   1.0f, 1.0f, 0.0f,   0.0f, 0.0f,    // top left 
+	//// vertices for rectangle as two triangles, texture mapping deals with OGL flipping the image
+	//float vertices[] = {
+	//	// positions          // colors           // texture coords
+	//	 1.f,  1.f, 0.0f,   1.0f, 0.0f, 0.0f,   1.0f, 0.0f,   // top right
+	//	 1.f, -1.f, 0.0f,   0.0f, 1.0f, 0.0f,   1.0f, 1.0f,   // bottom right
+	//	-1.f,  1.f, 0.0f,   1.0f, 1.0f, 0.0f,   0.0f, 0.0f,    // top left 
 
-		 1.f, -1.f, 0.0f,   0.0f, 1.0f, 0.0f,   1.0f, 1.0f,   // bottom right
-		-1.f, -1.f, 0.0f,   0.0f, 0.0f, 1.0f,   0.0f, 1.0f,   // bottom left
-		-1.f,  1.f, 0.0f,   1.0f, 1.0f, 0.0f,   0.0f, 0.0f,    // top left 
-		 
-	};
+	//	 1.f, -1.f, 0.0f,   0.0f, 1.0f, 0.0f,   1.0f, 1.0f,   // bottom right
+	//	-1.f, -1.f, 0.0f,   0.0f, 0.0f, 1.0f,   0.0f, 1.0f,   // bottom left
+	//	-1.f,  1.f, 0.0f,   1.0f, 1.0f, 0.0f,   0.0f, 0.0f,    // top left 
+	//	 
+	//};
 
 	
 	// just the four corners
@@ -131,6 +131,18 @@ int main(int argc, const char** argv)
 	//	-1.0f,  1.f, 0.0f,   1.0f, 1.0f, 0.0f,   0.0f, 0.0f,    // top left 
 	//	-1.f,  -1.f, 0.0f,   0.0f, 0.0f, 1.0f,   0.0f, 1.0f,   // bottom left
 	//};
+
+	// 2D rejig
+	float vertices[] = {
+		// pos      // tex
+		0.0f, 1.0f, 0.0f, 1.0f,
+		1.0f, 0.0f, 1.0f, 0.0f,
+		0.0f, 0.0f, 0.0f, 0.0f,
+
+		0.0f, 1.0f, 0.0f, 1.0f,
+		1.0f, 1.0f, 1.0f, 1.0f,
+		1.0f, 0.0f, 1.0f, 0.0f
+	};
 
 
 	// texture buffer setup
@@ -143,15 +155,16 @@ int main(int argc, const char** argv)
 	glBindBuffer(GL_ARRAY_BUFFER, VBO);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
 
-	// position attribute
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
+	// vertex and texture coords in one array
+	glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)0);
 	glEnableVertexAttribArray(0);
+
 	// color attribute
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
-	glEnableVertexAttribArray(1);
+	/*glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
+	glEnableVertexAttribArray(1);*/
 	// texture coord attribute
-	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
-	glEnableVertexAttribArray(2);
+	/*glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
+	glEnableVertexAttribArray(2);*/
 
 	// texture setup for video play back
 	GLuint tex_handle;
@@ -169,8 +182,8 @@ int main(int argc, const char** argv)
 	VideoReader videoReader("videos/butterfly.mp4");
 
 	// compile texture shaders
-	Shader textureShader("shaders/texture_shader.vert", "shaders/texture_shader.frag");
-	Shader textureShader_01("shaders/glitch_shader.vert", "shaders/glitch_shader.frag");
+	Shader textureShader_01("shaders/texture_shader2D.vert", "shaders/texture_shader.frag");
+	Shader textureShader("shaders/glitch_shader.vert", "shaders/glitch_shader.frag");
 
 	// shader uniform setup
 	int currentWw, currentWh;
