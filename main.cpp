@@ -166,11 +166,11 @@ int main(int argc, const char** argv)
 	
 	
 	// init videoreader and load video
-	VideoReader videoReader("videos/face_00.mp4");
+	VideoReader videoReader("videos/butterfly.mp4");
 
 	// compile texture shaders
-	Shader textureShader_01("shaders/texture_shader.vert", "shaders/texture_shader.frag");
-	Shader textureShader("shaders/glitch_shader.vert", "shaders/glitch_shader.frag");
+	Shader textureShader("shaders/texture_shader.vert", "shaders/texture_shader.frag");
+	Shader textureShader_01("shaders/glitch_shader.vert", "shaders/glitch_shader.frag");
 
 	// shader uniform setup
 	int currentWw, currentWh;
