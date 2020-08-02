@@ -109,15 +109,6 @@ int main(int argc, const char** argv)
 		return -1;
 	}
 	
-	// just the four corners
-	//float vertices[] = {
-	//	// positions          // colors           // texture coords
-	//	 1.0f,  1.f, 0.0f,   1.0f, 0.0f, 0.0f,   1.0f, 0.0f,   // top right
-	//	 1.0f, -1.f, 0.0f,   0.0f, 1.0f, 0.0f,   1.0f, 1.0f,   // bottom right
-	//	-1.0f,  1.f, 0.0f,   1.0f, 1.0f, 0.0f,   0.0f, 0.0f,    // top left 
-	//	-1.f,  -1.f, 0.0f,   0.0f, 0.0f, 1.0f,   0.0f, 1.0f,   // bottom left
-	//};
-
 	// 2D rejig fill screen
 	float vertices[] = {
 		// pos      // tex
@@ -156,13 +147,6 @@ int main(int argc, const char** argv)
 	// vertex and texture coords in one array
 	glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)0);
 	glEnableVertexAttribArray(0);
-
-	// color attribute
-	/*glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
-	glEnableVertexAttribArray(1);*/
-	// texture coord attribute
-	/*glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
-	glEnableVertexAttribArray(2);*/
 
 	// texture setup for video play back
 	GLuint tex_handle;
