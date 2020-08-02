@@ -1,8 +1,3 @@
-/* NO LONGER IN USE */
-
-
-// https://www.youtube.com/watch?v=MEMzo59CPr8
-// 2:08
 
 extern "C" {
 #include <libavcodec/avcodec.h>

@@ -150,8 +150,6 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\..\Documents\Visual Studio 2019\Libraries\glad\src\glad.c" />
-    <ClCompile Include="loadFrame.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="parseCommandLineArgs.cpp" />
     <ClCompile Include="Shader.cpp" />
