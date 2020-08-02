@@ -8,8 +8,8 @@
 #include "Shader.h"
 #include "VideoReader.h"
 
-const int WWIDTH = 1920;
-const int WHEIGHT = 1080;
+const int WWIDTH = 800;
+const int WHEIGHT = 600;
 
 // ---------------------------------------------------------------------------------------------
 void framebuffer_size_callback(GLFWwindow* window, int width, int height)
@@ -108,20 +108,6 @@ int main(int argc, const char** argv)
 		std::cout << "failed to initialize GLAD" << std::endl;
 		return -1;
 	}
-
-	//// vertices for rectangle as two triangles, texture mapping deals with OGL flipping the image
-	//float vertices[] = {
-	//	// positions          // colors           // texture coords
-	//	 1.f,  1.f, 0.0f,   1.0f, 0.0f, 0.0f,   1.0f, 0.0f,   // top right
-	//	 1.f, -1.f, 0.0f,   0.0f, 1.0f, 0.0f,   1.0f, 1.0f,   // bottom right
-	//	-1.f,  1.f, 0.0f,   1.0f, 1.0f, 0.0f,   0.0f, 0.0f,    // top left 
-
-	//	 1.f, -1.f, 0.0f,   0.0f, 1.0f, 0.0f,   1.0f, 1.0f,   // bottom right
-	//	-1.f, -1.f, 0.0f,   0.0f, 0.0f, 1.0f,   0.0f, 1.0f,   // bottom left
-	//	-1.f,  1.f, 0.0f,   1.0f, 1.0f, 0.0f,   0.0f, 0.0f,    // top left 
-	//	 
-	//};
-
 	
 	// just the four corners
 	//float vertices[] = {
@@ -132,17 +118,29 @@ int main(int argc, const char** argv)
 	//	-1.f,  -1.f, 0.0f,   0.0f, 0.0f, 1.0f,   0.0f, 1.0f,   // bottom left
 	//};
 
-	// 2D rejig
+	// 2D rejig fill screen
 	float vertices[] = {
 		// pos      // tex
-		0.0f, 1.0f, 0.0f, 1.0f,
-		1.0f, 0.0f, 1.0f, 0.0f,
-		0.0f, 0.0f, 0.0f, 0.0f,
+		-1.0f, -1.0f, 0.0f, 1.0f,
+		1.0f, 1.0f, 1.0f, 0.0f,
+		-1.0f, 1.0f, 0.0f, 0.0f,
 
-		0.0f, 1.0f, 0.0f, 1.0f,
-		1.0f, 1.0f, 1.0f, 1.0f,
-		1.0f, 0.0f, 1.0f, 0.0f
+		-1.0f, -1.0f, 0.0f, 1.0f,
+		1.0f, -1.0f, 1.0f, 1.0f,
+		1.0f, 1.0f, 1.0f, 0.0f
 	};
+
+	//// 2D rejig, top right corner
+	//float vertices[] = {
+	//	// pos      // tex
+	//	0.0f, 1.0f, 0.0f, 1.0f,
+	//	1.0f, 0.0f, 1.0f, 0.0f,
+	//	0.0f, 0.0f, 0.0f, 0.0f,
+
+	//	0.0f, 1.0f, 0.0f, 1.0f,
+	//	1.0f, 1.0f, 1.0f, 1.0f,
+	//	1.0f, 0.0f, 1.0f, 0.0f
+	//};
 
 
 	// texture buffer setup
@@ -182,8 +180,8 @@ int main(int argc, const char** argv)
 	VideoReader videoReader("videos/butterfly.mp4");
 
 	// compile texture shaders
-	Shader textureShader_01("shaders/texture_shader2D.vert", "shaders/texture_shader.frag");
-	Shader textureShader("shaders/glitch_shader.vert", "shaders/glitch_shader.frag");
+	//Shader textureShader_01("shaders/texture_shader2D.vert", "shaders/texture_shader.frag");
+	Shader textureShader_01("shaders/chaos_shader.vert", "shaders/chaos_shader.frag");
 
 	// shader uniform setup
 	int currentWw, currentWh;
